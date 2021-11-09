@@ -4,6 +4,7 @@ import socket
 import ssl
 import json
 import requests
+import re
 
 
 # use context for SSL
@@ -40,4 +41,9 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
 			_, headers = data.split('\r\n', 1)
 			print(type(headers))
 			print('Header: ', headers)
+			regexped_obj = re.compile("token=.*")
+			print('Regexp object: ', regexped_obj)
+			regexped_response = filter(regexped_obj.match, headers)
+			print('Regexped response')
+
 
