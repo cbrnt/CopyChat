@@ -38,12 +38,19 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
 				break
 			print('Data: ', data)
 			data = data.decode()
-			_, headers = data.split('\r\n', 1)
+			headers = data.split('\r\n', -1)
 			print(type(headers))
-			print('Header: ', headers)
-			regexped_obj = re.compile("token=.*")
+			print('Headers: ', headers)
+			regexped_obj = re.compile(".*POST.*")
 			print('Regexp object: ', regexped_obj)
-			regexped_response = filter(regexped_obj.match, headers)
-			print('Regexped response')
-
+			regexped_response = list(filter(regexped_obj.match, headers))
+			print('Regexped response: ')
+			needed_data = headers[len(headers)-1]
+			print('Needed data: ',needed_data)
+			get_values = needed_data.split('&', -1)
+			print('Got values: ', get_values)
+			re_obj = re.compile(".*channel_name.*")
+			channel_name = list(filter(re_obj.match, get_values))
+			print('Channnel name: ', channel_name)
+			
 
