@@ -12,11 +12,12 @@ import requests
 HOST = '109.195.230.198'  # Standard loopback interface address (localhost)
 PORT = 8070
 
-while True:
-	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-		sock.bind((HOST, PORT))
-		print('Binded port', PORT)
-		sock.listen(5) # limited to 5 connection in qeueue
+
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+	sock.bind((HOST, PORT))
+	print('Binded port', PORT)
+	sock.listen(5) # limited to 5 connection in qeueue
+	while True:
 		conn, addr = sock.accept()
 		print('conn: ', conn)
 		print('Connected by', addr)
