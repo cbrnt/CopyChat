@@ -15,7 +15,8 @@ PORT = 8070
 
 
 def get_value(raw_list, parameter):
-	re_obj = re.compile(".*%s.*" % parameter)
+	re_obj = re.compile('%s=*' % parameter)
+	print('re_obj = ', re_obj)
 	value = list(filter(re_obj.match, raw_list))
 	print('%s: ' % parameter, value)
 	return value
@@ -44,21 +45,18 @@ try:
 
 				if not data:
 					break
-				print('Data: ', data)
 				data = data.decode()
 				headers = data.split('\r\n', -1)
-				print(type(headers))
-				print('Headers: ', headers)
-				regexped_obj = re.compile(".*POST.*")
-				print('Regexp object: ', regexped_obj)
-				regexped_response = list(filter(regexped_obj.match, headers))
-				print('Regexped response: ')
-				needed_data = headers[len(headers)-1]
-				print('Needed data: ',needed_data)
-				get_values = needed_data.split('&', -1)
-				print('Got values: ', get_values)
-				channel_name = get_values(needed_data, 'channel_name')
-				print('channel_name: ', channel_name)
+				pattern = re.compile(".*token=.*")
+				result = [s for s in headers if pattern.search(s)]
+				print(result)
+				attrib_list = re.split('&', result[0])
+				attrib_dict = dict()
+				for i in attrib_list:
+					splitted_att = re.split('=', i)
+					attrib_dict[splitted_att[0]] = splitted_att[1]
+				print(attrib_dict)
+
 
 
 
