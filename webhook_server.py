@@ -25,9 +25,12 @@ def get_value(raw_list, parameter):
 	return value
 
 try:
-	app = App(token=os.environ.get("SLACK_BOT_TOKEN"))
-	if __name__ == "__main__":
-		SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"]).start()
+	app = App(
+		token=os.environ.get("SLACK_BOT_TOKEN"),
+		signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
+	)
+
+	app.start(port=int(os.environ.get("PORT", 3000)))
 
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
 		sock.bind((HOST, PORT))
