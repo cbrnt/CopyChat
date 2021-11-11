@@ -45,9 +45,13 @@ while True:
 			else:
 				data = data.decode()
 				headers = data.split('\r\n', -1)
+				print('Headers: ', headers)
 				pattern = re.compile(".*token=.*")
 				result = [s for s in headers if pattern.search(s)]
-				print(result)
+				if result:
+					print(result)
+				else:
+					print('No data in parsed headers')
 				attrib_list = re.split('&', result[0])
 				attrib_dict = dict()
 
