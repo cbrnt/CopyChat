@@ -1,0 +1,20 @@
+POST /api/chat.postMessage
+Content-type: application/json
+Authorization: Bearer xapp-1-A02LTJHNC10-2708127090611-b0f49ef7894fa9df98a941a69b52fe8b68c4ba0fce60bcee48966184f1c264fa
+{"channel":"C061EG9SL","text":"I hope the tour went well, Mr. Wonka."}
+
+
+curl -X POST -H 'Authorization: Bearer xoxb-716016084567-2737121813472-PNFd2zMWDxBRUZXnd0gjoKcS' \
+-H 'Content-type: application/json' \
+--data '{"channel":"test-out-hooks"}' \
+https://slack.com/api/chat.postMessage
+
+
+
+curl -X POST -H 'Authorization: Bearer xoxb-716016084567-2737121813472-PNFd2zMWDxBRUZXnd0gjoKcS' \
+-H 'Content-type: application/json' \
+--data '{"channel":"test-out-hooks"}' \
+https://slack.com/api/conversations.info
+
+curl -X GET -H 'Authorization: Bearer xoxb-716016084567-2737121813472-PNFd2zMWDxBRUZXnd0gjoKcS' \
+https://slack.com/api/conversations.list

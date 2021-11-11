@@ -25,10 +25,6 @@ def get_value(raw_list, parameter):
 	return value
 
 try:
-	app = App(
-		token=os.environ.get("SLACK_BOT_TOKEN"),
-		signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
-	)
 
 	app.start(port=int(os.environ.get("PORT", 3000)))
 
@@ -61,10 +57,17 @@ try:
 				print(result)
 				attrib_list = re.split('&', result[0])
 				attrib_dict = dict()
+				got_token = attrib_dict['token']
+				print('Token = ', got_token)
 				for i in attrib_list:
 					splitted_att = re.split('=', i)
 					attrib_dict[splitted_att[0]] = splitted_att[1]
 				print(attrib_dict)
+				# Проверяю валидность токена из прилетевшего запроса
+				for val in os.environ.values():
+					if val == got_token:
+						print('True token = ',val, 'Got token', got_token)
+
 				# add token verification!!!
 
 	# Create Slack API connection
