@@ -16,31 +16,32 @@ HOST = '109.195.230.198'  # Standard loopback interface address (localhost)
 PORT = 8070
 
 
-try:
-
-
-	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	sock.bind((HOST, PORT))
-	print('Binded port', PORT)
-	sock.listen(5) # limited to 5 connection in qeueue
-	while True:
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.bind((HOST, PORT))
+print('Binded port', PORT)
+sock.listen(5) # limited to 5 connection in queue
+while True:
+	sock = None
+	try:
+		# поднимаем TCP сокет
 		conn, addr = sock.accept()
 		print('conn: ', conn)
 		print('Connected by', addr)
 
+		#	with context.wrap_socket(sock, server_side=True) as ssock:
+		#		conn, addr = ssock.accept()
+		#		print('conn: ', conn)
+		#		print('Connected by', addr)
 
-
-	#	with context.wrap_socket(sock, server_side=True) as ssock:
-	#		conn, addr = ssock.accept()
-	#		print('conn: ', conn)
-	#		print('Connected by', addr)
-
+		# принимаем данные
 		while True:
-			data = conn.recv(1024)
+			data = conn.recv(200)
 			print(type(data))
 
 			if not data:
 				break
+			# здесь бы проверить цельность данных и можно ли их проверить
+
 			data = data.decode()
 			headers = data.split('\r\n', -1)
 			pattern = re.compile(".*token=.*")
@@ -59,11 +60,13 @@ try:
 			for val in os.environ.values():
 				if val == got_token:
 					print('True token = ',val, 'Got token', got_token)
-
+	except KeyboardInterrupt:
+		if sock:
+			sock.close()
+		break
 
 
 # Re-create hooks that were used in non-secured connections
 
-except KeyboardInterrupt:
-	sock.close()
+
 
