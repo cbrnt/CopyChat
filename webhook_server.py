@@ -42,25 +42,26 @@ while True:
 			if not data:
 				break
 			# здесь бы проверить цельность данных и можно ли их проверить
+			else:
+				data = data.decode()
+				headers = data.split('\r\n', -1)
+				pattern = re.compile(".*token=.*")
+				result = [s for s in headers if pattern.search(s)]
+				print(result)
+				attrib_list = re.split('&', result[0])
+				attrib_dict = dict()
 
-			data = data.decode()
-			headers = data.split('\r\n', -1)
-			pattern = re.compile(".*token=.*")
-			result = [s for s in headers if pattern.search(s)]
-			print(result)
-			attrib_list = re.split('&', result[0])
-			attrib_dict = dict()
+				for i in attrib_list:
+					splitted_att = re.split('=', i)
+					attrib_dict[splitted_att[0]] = splitted_att[1]
+				print(attrib_dict)
+				# Проверяю валидность токена из прилетевшего запроса
+				got_token = attrib_dict['token']
+				print('Token = ', got_token)
+				for val in os.environ.values():
+					if val == got_token:
+						print('True token = ',val, 'Got token', got_token)
 
-			for i in attrib_list:
-				splitted_att = re.split('=', i)
-				attrib_dict[splitted_att[0]] = splitted_att[1]
-			print(attrib_dict)
-			# Проверяю валидность токена из прилетевшего запроса
-			got_token = attrib_dict['token']
-			print('Token = ', got_token)
-			for val in os.environ.values():
-				if val == got_token:
-					print('True token = ',val, 'Got token', got_token)
 	except KeyboardInterrupt:
 		if sock:
 			sock.close()
