@@ -27,10 +27,6 @@ while True:
 		if DEBUG:
 			print('Binded port', PORT)
 		sock.listen(5)  # limited to 5 connection in queue
-		conn, addr = sock.accept()
-		if DEBUG:
-			print('conn: ', conn)
-			print('Connected by', addr)
 
 		#	with context.wrap_socket(sock, server_side=True) as ssock:
 		#		conn, addr = ssock.accept()
@@ -39,13 +35,19 @@ while True:
 
 		# принимаем данные
 		while True:
+			conn, addr = sock.accept()
+			if DEBUG:
+				print('conn: ', conn)
+				print('Connected by', addr)
+
 			data = conn.recv(1024)
 			# проверь потом с большим текстовым сообщением
-			print(type(data))
 
 			if data:
 				data = data.decode()
 				headers = data.split('\r\n', -1)
+				if DEBUG:
+				    print('Headers: ', headers)
 				pattern = re.compile(".*token=.*")
 				result = [s for s in headers if pattern.search(s)]
 				if result:
@@ -68,7 +70,7 @@ while True:
 					if val:
 						if val == got_token:
 							if DEBUG:
-								print('Got valid token: %s', val)
+								print('Got valid token: %s' % val)
 						else:
 							if DEBUG:
 								print('Token is not valid')
