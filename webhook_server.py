@@ -6,8 +6,7 @@ import json
 import requests
 import re
 import os
-from slack_bolt import App
-from slack_bolt.adapter.socket_mode import SocketModeHandler
+
 
 
 # use context for SSL
@@ -26,7 +25,6 @@ def get_value(raw_list, parameter):
 
 try:
 
-	app.start(port=int(os.environ.get("PORT", 3000)))
 
 	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
 		sock.bind((HOST, PORT))
@@ -57,24 +55,18 @@ try:
 				print(result)
 				attrib_list = re.split('&', result[0])
 				attrib_dict = dict()
-				got_token = attrib_dict['token']
+
 				print('Token = ', got_token)
 				for i in attrib_list:
 					splitted_att = re.split('=', i)
 					attrib_dict[splitted_att[0]] = splitted_att[1]
 				print(attrib_dict)
 				# Проверяю валидность токена из прилетевшего запроса
+				got_token = attrib_dict['token']
 				for val in os.environ.values():
 					if val == got_token:
 						print('True token = ',val, 'Got token', got_token)
 
-				# add token verification!!!
-
-	# Create Slack API connection
-
-
-
-# TEST_OUT_WEBHOOK_TOKEN
 
 
 # Re-create hooks that were used in non-secured connections
