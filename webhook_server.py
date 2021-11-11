@@ -16,56 +16,49 @@ HOST = '109.195.230.198'  # Standard loopback interface address (localhost)
 PORT = 8070
 
 
-def get_value(raw_list, parameter):
-	re_obj = re.compile('%s=*' % parameter)
-	print('re_obj = ', re_obj)
-	value = list(filter(re_obj.match, raw_list))
-	print('%s: ' % parameter, value)
-	return value
-
 try:
 
 
-	with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-		sock.bind((HOST, PORT))
-		print('Binded port', PORT)
-		sock.listen(5) # limited to 5 connection in qeueue
+	sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+	sock.bind((HOST, PORT))
+	print('Binded port', PORT)
+	sock.listen(5) # limited to 5 connection in qeueue
+	while True:
+		conn, addr = sock.accept()
+		print('conn: ', conn)
+		print('Connected by', addr)
+
+
+
+	#	with context.wrap_socket(sock, server_side=True) as ssock:
+	#		conn, addr = ssock.accept()
+	#		print('conn: ', conn)
+	#		print('Connected by', addr)
+
 		while True:
-			conn, addr = sock.accept()
-			print('conn: ', conn)
-			print('Connected by', addr)
+			data = conn.recv(1024)
+			print(type(data))
 
+			if not data:
+				break
+			data = data.decode()
+			headers = data.split('\r\n', -1)
+			pattern = re.compile(".*token=.*")
+			result = [s for s in headers if pattern.search(s)]
+			print(result)
+			attrib_list = re.split('&', result[0])
+			attrib_dict = dict()
 
-
-		#	with context.wrap_socket(sock, server_side=True) as ssock:
-		#		conn, addr = ssock.accept()
-		#		print('conn: ', conn)
-		#		print('Connected by', addr)
-
-			while True:
-				data = conn.recv(1024)
-				print(type(data))
-
-				if not data:
-					break
-				data = data.decode()
-				headers = data.split('\r\n', -1)
-				pattern = re.compile(".*token=.*")
-				result = [s for s in headers if pattern.search(s)]
-				print(result)
-				attrib_list = re.split('&', result[0])
-				attrib_dict = dict()
-
-				print('Token = ', got_token)
-				for i in attrib_list:
-					splitted_att = re.split('=', i)
-					attrib_dict[splitted_att[0]] = splitted_att[1]
-				print(attrib_dict)
-				# Проверяю валидность токена из прилетевшего запроса
-				got_token = attrib_dict['token']
-				for val in os.environ.values():
-					if val == got_token:
-						print('True token = ',val, 'Got token', got_token)
+			for i in attrib_list:
+				splitted_att = re.split('=', i)
+				attrib_dict[splitted_att[0]] = splitted_att[1]
+			print(attrib_dict)
+			# Проверяю валидность токена из прилетевшего запроса
+			got_token = attrib_dict['token']
+			print('Token = ', got_token)
+			for val in os.environ.values():
+				if val == got_token:
+					print('True token = ',val, 'Got token', got_token)
 
 
 
