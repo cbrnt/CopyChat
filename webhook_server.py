@@ -60,13 +60,14 @@ while True:
 						splitted_att = re.split('=', i)
 						attrib_dict[splitted_att[0]] = splitted_att[1]
 					print(attrib_dict)
+					print(type(attrib_dict))
 					# Проверяю валидность токена из прилетевшего запроса
 					got_token = attrib_dict['token']
 					print('Token = ', got_token)
-					#true_token = os.environ.values()
-					true_token = 'npgVipKxFSz1iRdQoDorDuM6'
-					for val in os.environ.values():
-						if true_token == got_token:
+					#true_token = 'npgVipKxFSz1iRdQoDorDuM6'
+					print('os.environ.values() = ',os.environ.values())
+					for val in iter(os.environ.values()):
+						if val == got_token:
 							print('True token = ', val, 'Got token', got_token)
 						else:
 							print('Token is not valid. Hacker?')
