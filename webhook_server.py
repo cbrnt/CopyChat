@@ -40,13 +40,7 @@ while True:
 			# проверь потом с большим текстовым сообщением
 			print(type(data))
 
-
-			if not data:
-				print('No data received. Data = ', data)
-				print('Going to next loop iteration')
-				break
-			# здесь бы проверить цельность данных и можно ли их проверить
-			else:
+			if data:
 				data = data.decode()
 				headers = data.split('\r\n', -1)
 				print('Headers: ', headers)
