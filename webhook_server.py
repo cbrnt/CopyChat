@@ -36,8 +36,10 @@ while True:
 
 		# принимаем данные
 		while True:
-			data = conn.recv(200)
+			data = conn.recv(1024)
+			# проверь потом с большим текстовым сообщением
 			print(type(data))
+
 
 			if not data:
 				print('No data received. Data = ', data)
@@ -61,9 +63,13 @@ while True:
 					# Проверяю валидность токена из прилетевшего запроса
 					got_token = attrib_dict['token']
 					print('Token = ', got_token)
+					#true_token = os.environ.values()
+					true_token = 'npgVipKxFSz1iRdQoDorDuM6'
 					for val in os.environ.values():
-						if val == got_token:
+						if true_token == got_token:
 							print('True token = ', val, 'Got token', got_token)
+						else:
+							print('Token is not valid. Hacker?')
 				else:
 					print( 'So odd. Data received, headers in place, but Result is empty! Breaking loop iteration and going to next')
 					break
