@@ -66,9 +66,10 @@ while True:
 					print('Token = ', got_token)
 					#true_token = 'npgVipKxFSz1iRdQoDorDuM6'
 					print('os.environ.values() = ',os.environ.values())
-					for val in iter(os.environ.values()):
+					val = os.environ.values('TEST_OUT_WEBHOOK')
+					if val:
 						if val == got_token:
-							print('True token = ', val, 'Got token', got_token)
+							print('Env token = ', val, 'Got token', got_token)
 						else:
 							print('Token is not valid. Hacker?')
 				else:
