@@ -40,6 +40,8 @@ while True:
 			print(type(data))
 
 			if not data:
+				print('No data received. Data = ', data)
+				print('Going to next loop iteration')
 				break
 			# здесь бы проверить цельность данных и можно ли их проверить
 			else:
@@ -50,21 +52,25 @@ while True:
 				result = [s for s in headers if pattern.search(s)]
 				if result:
 					print(result)
+					attrib_list = re.split('&', result[0])
+					attrib_dict = dict()
+					for i in attrib_list:
+						splitted_att = re.split('=', i)
+						attrib_dict[splitted_att[0]] = splitted_att[1]
+					print(attrib_dict)
+					# Проверяю валидность токена из прилетевшего запроса
+					got_token = attrib_dict['token']
+					print('Token = ', got_token)
+					for val in os.environ.values():
+						if val == got_token:
+							print('True token = ', val, 'Got token', got_token)
 				else:
-					print('No data in parsed headers')
-				attrib_list = re.split('&', result[0])
-				attrib_dict = dict()
+					print( 'So odd. Data received, headers in place, but Result is empty! Breaking loop iteration and going to next')
+					break
 
-				for i in attrib_list:
-					splitted_att = re.split('=', i)
-					attrib_dict[splitted_att[0]] = splitted_att[1]
-				print(attrib_dict)
-				# Проверяю валидность токена из прилетевшего запроса
-				got_token = attrib_dict['token']
-				print('Token = ', got_token)
-				for val in os.environ.values():
-					if val == got_token:
-						print('True token = ',val, 'Got token', got_token)
+
+
+
 
 	except KeyboardInterrupt:
 		if sock:
