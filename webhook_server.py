@@ -16,14 +16,15 @@ HOST = '109.195.230.198'  # Standard loopback interface address (localhost)
 PORT = 8070
 
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sock.bind((HOST, PORT))
-print('Binded port', PORT)
-sock.listen(5) # limited to 5 connection in queue
+
 while True:
 	sock = None
 	try:
 		# поднимаем TCP сокет
+		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+		sock.bind((HOST, PORT))
+		print('Binded port', PORT)
+		sock.listen(5)  # limited to 5 connection in queue
 		conn, addr = sock.accept()
 		print('conn: ', conn)
 		print('Connected by', addr)
