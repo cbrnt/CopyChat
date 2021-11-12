@@ -19,16 +19,6 @@ PORT = 8070
 
 DEBUG = 1
 
-def get_var_env(var_name):
-	envview = os.environ.values()
-	if DEBUG:
-		print('os.environ.values() = ', envview)
-	var_check_result = list((val for val in iter(envview) if val == var_name))
-	if DEBUG:
-		print('var_check_result = ', var_check_result)
-	if len(var_check_result) == 1:
-		return var_check_result[0]
-
 while True:
 	sock = None
 	try:
@@ -84,7 +74,6 @@ while True:
 							valid_token = token_check_result[0]
 							print('Got valid token: %s' % valid_token)
 					# токен нормальный, извлекаем данные
-
 						got_channel_name = attrib_dict['channel_name']
 						got_text = attrib_dict['text']
 						if DEBUG:
@@ -92,12 +81,33 @@ while True:
 							print('got_text = ', got_text)
 
 						# получаем список каналов другого спейса
-						bot_token = get_var_env('SLACK_BOT_TOKEN')
+						bot_token = os.environ['SLACK_BOT_TOKEN']
 						if DEBUG:
 							print('bot_token = ', bot_token)
-						headers = 'Authorization: Bearer %s' % bot_token
-						channels_list = requests.get('https://slack.com/api/conversations.list', headers)
-
+						headers = { 'Authorization': 'Bearer %s' %bot_token}
+						if DEBUG:
+						    print('Headers for send request:', headers)
+						channels_list = requests.get('https://slack.com/api/conversations.list', headers=headers)
+						if channels_list.status_code == 200:
+							if DEBUG:
+								print('channel_list status code: ', channels_list.status_code)
+								print('channel_list text: ', channels_list.text)
+								print('channel_list headers: ', channels_list.headers)
+							channels_dict = channels_list.json()
+							print('Type channels_dict: ', type(channels_dict))
+							print('channels_dict = ', channels_dict)
+							print('id = ', channels_dict['channels'])
+							channels = channels_dict['channels']
+							for channel in range(len(channels)):
+							    print(channels[channel]['id'],channels[channel]['name'])
+								if channels[channel]['name'] == got_channel_name:
+								    channel_id = channels[channel]['id']
+									if DEBUG:
+										print('channel_id = ', channel_id)
+									
+							    
+							    
+							
 
 					else:
 						if DEBUG:
