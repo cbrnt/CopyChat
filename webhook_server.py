@@ -66,14 +66,26 @@ while True:
 					got_token = attrib_dict['token']
 					if DEBUG:
 						print('os.environ.values() = ',os.environ.values())
-					val = os.environ['TEST_OUT_WEBHOOK']
-					if val:
-						if val == got_token:
-							if DEBUG:
-								print('Got valid token: %s' % val)
-						else:
-							if DEBUG:
-								print('Token is not valid')
+					env_vars = os.environ.values()
+					if DEBUG:
+					    print('env_vars = ', env_vars)
+					token_check_result = list((val for val in iter(env_vars) if val == got_token))
+					if DEBUG:
+					    print('token_check_result = ',token_check_result)
+					if len(token_check_result) == 1:
+						if DEBUG:
+							valid_token = token_check_result[0]
+							print('Got valid token: %s' % valid_token)
+						got_channel_name = attrib_dict['channel_name']
+						got_text = attrib_dict['text']
+						if DEBUG:
+							print('got_channel = ', got_channel_name)
+							print('got_text = ', got_text)
+							
+						
+					else:
+						if DEBUG:
+							print('Token is not valid')
 
 				else:
 					if DEBUG:
