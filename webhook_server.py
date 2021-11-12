@@ -87,7 +87,8 @@ while True:
 						headers = { 'Authorization': 'Bearer %s' %bot_token}
 						if DEBUG:
 							print('Headers for send request:', headers)
-						channels_list = requests.get('https://slack.com/api/conversations.list', headers=headers)
+						channels_list = requests.get('https://slack.com/api/conversations.list',
+													 headers=headers)
 						if channels_list.status_code == 200:
 							if DEBUG:
 								print('channel_list status code: ', channels_list.status_code)
@@ -104,6 +105,14 @@ while True:
 									channel_id = channels[channel]['id']
 									if DEBUG:
 										print('channel_id = ', channel_id)
+									headers = {'Authorization': 'Bearer %s' % bot_token, 'Content-type': 'application/json'}
+									if DEBUG:
+										print('Headers for send request:', headers)
+									json = { "channel":"%s" % channel_id,"text":"%s" % got_text }
+									if DEBUG:
+										print('json = ', json)
+									channels_list = requests.post('https://slack.com/api/chat.postMessage',
+																 headers=headers, json=json)
 									
 							    
 							    
