@@ -11,12 +11,23 @@ import os
 
 # use context for SSL
 #context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+# добавь серт letsencrypt
+
 
 HOST = '109.195.230.198'  # Standard loopback interface address (localhost)
 PORT = 8070
 
 DEBUG = 1
 
+def get_var_env(var_name):
+	envview = os.environ.values()
+	if DEBUG:
+		print('os.environ.values() = ', envview)
+	var_check_result = list((val for val in iter(envview) if val == var_name))
+	if DEBUG:
+		print('var_check_result = ', var_check_result)
+	if len(var_check_result) == 1:
+		return var_check_result[0]
 
 while True:
 	sock = None
@@ -47,7 +58,7 @@ while True:
 				data = data.decode()
 				headers = data.split('\r\n', -1)
 				if DEBUG:
-				    print('Headers: ', headers)
+					print('Headers: ', headers)
 				pattern = re.compile(".*token=.*")
 				result = [s for s in headers if pattern.search(s)]
 				if result:
@@ -64,28 +75,34 @@ while True:
 
 					# Проверяю валидность токена из прилетевшего запроса
 					got_token = attrib_dict['token']
-					if DEBUG:
-						print('os.environ.values() = ',os.environ.values())
 					env_vars = os.environ.values()
-					if DEBUG:
-					    print('env_vars = ', env_vars)
 					token_check_result = list((val for val in iter(env_vars) if val == got_token))
 					if DEBUG:
-					    print('token_check_result = ',token_check_result)
+						print('token_check_result = ',token_check_result)
 					if len(token_check_result) == 1:
 						if DEBUG:
 							valid_token = token_check_result[0]
 							print('Got valid token: %s' % valid_token)
+					# токен нормальный, извлекаем данные
+
 						got_channel_name = attrib_dict['channel_name']
 						got_text = attrib_dict['text']
 						if DEBUG:
 							print('got_channel = ', got_channel_name)
 							print('got_text = ', got_text)
-							
-						
+
+						# получаем список каналов другого спейса
+						bot_token = get_var_env('SLACK_BOT_TOKEN')
+						if DEBUG:
+							print('bot_token = ', bot_token)
+						headers = 'Authorization: Bearer %s' % bot_token
+						channels_list = requests.get('https://slack.com/api/conversations.list', headers)
+
+
 					else:
 						if DEBUG:
 							print('Token is not valid')
+					# токена нет в окружении, значит не пересылаем сообщение, ждем следуюшего
 
 				else:
 					if DEBUG:
