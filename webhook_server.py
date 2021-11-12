@@ -86,7 +86,7 @@ while True:
 							print('bot_token = ', bot_token)
 						headers = { 'Authorization': 'Bearer %s' %bot_token}
 						if DEBUG:
-						    print('Headers for send request:', headers)
+							print('Headers for send request:', headers)
 						channels_list = requests.get('https://slack.com/api/conversations.list', headers=headers)
 						if channels_list.status_code == 200:
 							if DEBUG:
@@ -99,9 +99,9 @@ while True:
 							print('id = ', channels_dict['channels'])
 							channels = channels_dict['channels']
 							for channel in range(len(channels)):
-							    print(channels[channel]['id'],channels[channel]['name'])
+								print(channels[channel]['id'],channels[channel]['name'])
 								if channels[channel]['name'] == got_channel_name:
-								    channel_id = channels[channel]['id']
+									channel_id = channels[channel]['id']
 									if DEBUG:
 										print('channel_id = ', channel_id)
 									
