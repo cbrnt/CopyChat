@@ -7,17 +7,15 @@ import requests
 import re
 import os
 
-
-
-# use context for SSL
-#context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
-# добавь серт letsencrypt
-
-
-HOST = '109.195.230.198'  # Standard loopback interface address (localhost)
+HOST = '109.195.230.198'
 PORT = 8070
-
 DEBUG = 1
+CERT = '/etc/letsencrypt/live/gate.tochkak.ru/fullchain.pem'
+PRIVATE_CERT = '/etc/letsencrypt/live/gate.tochkak.ru/privkey.pem'
+
+
+context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+context.load_cert_chain( CERT, PRIVATE_CERT )
 
 while True:
 	sock = None
@@ -28,22 +26,17 @@ while True:
 		if DEBUG:
 			print('Binded port', PORT)
 		sock.listen(5)  # limited to 5 connection in queue
-
-		#	with context.wrap_socket(sock, server_side=True) as ssock:
-		#		conn, addr = ssock.accept()
-		#		print('conn: ', conn)
-		#		print('Connected by', addr)
+		# оборачиваем в SSL
+		ssock = context.wrap_socket(sock, server_side=True)
+		conn, addr = ssock.accept()
+		if DEBUG:
+			print('conn: ', conn)
+			print('Connected by', addr)
 
 		# принимаем данные
 		while True:
-			conn, addr = sock.accept()
-			if DEBUG:
-				print('conn: ', conn)
-				print('Connected by', addr)
-
 			data = conn.recv(1024)
 			# проверь потом с большим текстовым сообщением
-
 			if data:
 				data = data.decode()
 				headers = data.split('\r\n', -1)
@@ -113,10 +106,7 @@ while True:
 										print('json = ', json)
 									channels_list = requests.post('https://slack.com/api/chat.postMessage',
 																 headers=headers, json=json)
-									
-							    
-							    
-							
+
 
 					else:
 						if DEBUG:
@@ -133,8 +123,10 @@ while True:
 
 
 	except KeyboardInterrupt:
-		if sock:
-			sock.close()
+		if ssock:
+			ssock.close()
+			if sock:
+				sock.close()
 		break
 
 
