@@ -6,6 +6,10 @@ import json
 import requests
 import re
 import os
+import urllib3
+from io import BytesIO
+from http.client import HTTPResponse
+
 
 HOST = '109.195.230.198'
 PORT = 8070
@@ -16,6 +20,19 @@ PRIVATE_CERT = '/etc/letsencrypt/live/gate.tochkak.ru/privkey.pem'
 
 context = ssl.SSLContext( ssl.PROTOCOL_TLS_SERVER )
 context.load_cert_chain( CERT, PRIVATE_CERT )
+
+class BytesIOSocket:
+	def __init__(self, content):
+		self.handle = BytesIO(content)
+
+	def response_from_byte(data):
+		sock = BytesIOSocket(data)
+		response = HTTPResponse(sock)
+		response.begin()
+
+		return urllib3.HTTPResponse.from_httplib(response)
+
+
 
 while True:
 	sock = None
@@ -32,6 +49,11 @@ while True:
 		while True:
 			conn, addr = ssock.accept()
 			data = conn.recv(1024)
+			response = BytesIOSocket.response_from_byte(data)
+
+			print('response.data', response.data)
+			print('response.headers', response.headers)
+
 			if DEBUG:
 				print('conn: ', conn)
 				print('Connected by', addr)
@@ -54,6 +76,12 @@ while True:
 					if DEBUG:
 						print(attrib_dict)
 						print(type(attrib_dict))
+
+					# для подписки на события канала
+					# if attrib_dict['challenge']:
+					# 	challenge = attrib_dict['challenge']
+					# 	chal_headers = ''
+
 
 					# Проверяю валидность токена из прилетевшего запроса
 					got_token = attrib_dict['token']
