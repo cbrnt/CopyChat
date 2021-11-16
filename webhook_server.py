@@ -14,27 +14,29 @@ CERT = '/etc/letsencrypt/live/gate.tochkak.ru/fullchain.pem'
 PRIVATE_CERT = '/etc/letsencrypt/live/gate.tochkak.ru/privkey.pem'
 
 
-context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+context = ssl.SSLContext( ssl.PROTOCOL_TLS_SERVER )
 context.load_cert_chain( CERT, PRIVATE_CERT )
 
 while True:
 	sock = None
 	try:
 		# поднимаем TCP сокет
-		sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-		sock.bind((HOST, PORT))
+		sock = socket.socket( socket.AF_INET, socket.SOCK_STREAM )
+		sock.bind( ( HOST, PORT ) )
 		if DEBUG:
-			print('Binded port', PORT)
+			print( 'Binded port', PORT )
 		sock.listen(5)  # limited to 5 connection in queue
-		# оборачиваем в SSL
-		ssock = context.wrap_socket(sock, server_side=True)
-		conn, addr = ssock.accept()
+
+
 		if DEBUG:
 			print('conn: ', conn)
 			print('Connected by', addr)
 
 		# принимаем данные
 		while True:
+			# оборачиваем в SSL и принимаем дату для каждого нового соежинения
+			ssock = context.wrap_socket(sock, server_side=True)
+			conn, addr = ssock.accept()
 			data = conn.recv(1024)
 			# проверь потом с большим текстовым сообщением
 			if data:
