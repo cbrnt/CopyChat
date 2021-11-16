@@ -27,17 +27,14 @@ while True:
 			print( 'Binded port', PORT )
 		sock.listen(5)  # limited to 5 connection in queue
 
-
-		if DEBUG:
-			print('conn: ', conn)
-			print('Connected by', addr)
-
-		# принимаем данные
 		while True:
 			# оборачиваем в SSL и принимаем дату для каждого нового соежинения
 			ssock = context.wrap_socket(sock, server_side=True)
 			conn, addr = ssock.accept()
 			data = conn.recv(1024)
+			if DEBUG:
+				print('conn: ', conn)
+				print('Connected by', addr)
 			# проверь потом с большим текстовым сообщением
 			if data:
 				data = data.decode()
