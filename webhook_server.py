@@ -114,8 +114,8 @@ while True:
 
 				else:
 					if DEBUG:
-						print( 'So odd. Data received, headers in place, but Result is empty! Breaking loop iteration and going to next')
-					break
+						print( 'Data received but "result" is empty... Going next loop iteration!')
+
 
 
 
