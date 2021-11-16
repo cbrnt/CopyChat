@@ -25,6 +25,9 @@ class BytesIOSocket:
 	def __init__(self, content):
 		self.handle = BytesIO(content)
 
+	def makefile(self, mode):
+		return self.handle
+
 	def response_from_byte(data):
 		sock = BytesIOSocket(data)
 		response = HTTPResponse(sock)
