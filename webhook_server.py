@@ -69,7 +69,8 @@ while True:
 					# токен нормальный, извлекаем данные
 						got_channel_name = attrib_dict['channel_name']
 						got_text = attrib_dict['text']
-						got_text_un = urllib.parse.unquote(got_text)
+						got_text = urllib.parse.unquote(got_text)
+						got_text = urllib.parse.unquote_plus(got_text)
 
 						if DEBUG:
 							print('got_channel = ', got_channel_name)
