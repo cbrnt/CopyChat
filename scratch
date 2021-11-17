@@ -33,3 +33,11 @@ https://slack.com/api/chat.postMessage
 as_user = true
 link_names = true
 
+
+
+general
+changelog
+alarm
+event
+
+
