@@ -97,6 +97,7 @@ while True:
 							print('id = ', channels_dict['channels'])
 							channels = channels_dict['channels']
 							username = attrib_dict['user_name']
+							timestamp = attrib_dict['timestamp']
 							for channel in range(len(channels)):
 								print(channels[channel]['id'],channels[channel]['name'])
 								if channels[channel]['name'] == got_channel_name:
@@ -106,7 +107,10 @@ while True:
 									headers = {'Authorization': 'Bearer %s' % bot_token, 'Content-type': 'application/json'}
 									if DEBUG:
 										print('Headers for send request:', headers)
-									json = {"channel": "%s" % channel_id, "text": "%s" % got_text, "username": "%s" % username, "thread_ts": "%s" % thread_ts}
+									json = {"channel": "%s" % channel_id,
+											"text": "%s" % got_text,
+											"username": "%s" % username,
+											"thread_ts": "%s" % thread_ts, "timestamp": "%s" % timestamp}
 									if DEBUG:
 										print('json = ', json)
 									channels_list = requests.post('https://slack.com/api/chat.postMessage', headers=headers, json=json)
