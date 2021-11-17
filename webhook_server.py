@@ -94,7 +94,7 @@ while True:
 							print('channels_dict = ', channels_dict)
 							print('id = ', channels_dict['channels'])
 							channels = channels_dict['channels']
-							username = channels_dict['user_name']
+							username = attrib_dict['user_name']
 							for channel in range(len(channels)):
 								print(channels[channel]['id'],channels[channel]['name'])
 								if channels[channel]['name'] == got_channel_name:
