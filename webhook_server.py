@@ -8,7 +8,7 @@ import re
 import os
 import urllib.parse
 
-HOST = '109.195.230.198'
+HOST = '0.0.0.0'
 PORT = 8070
 DEBUG = 1
 CERT = '/etc/letsencrypt/live/gate.tochkak.ru/fullchain.pem'
@@ -61,11 +61,12 @@ while True:
 					env_vars = os.environ.values()
 					token_check_result = list((val for val in iter(env_vars) if val == got_token))
 					if DEBUG:
-						print('token_check_result = ',token_check_result)
+						print('token_check_result = ', token_check_result)
 					if len(token_check_result) == 1:
+						valid_token = token_check_result[0]
 						if DEBUG:
-							valid_token = token_check_result[0]
 							print('Got valid token: %s' % valid_token)
+
 					# токен нормальный, извлекаем данные
 						got_channel_name = attrib_dict['channel_name']
 						got_text = attrib_dict['text']
@@ -80,7 +81,7 @@ while True:
 						bot_token = os.environ['SLACK_BOT_TOKEN']
 						if DEBUG:
 							print('bot_token = ', bot_token)
-						headers = { 'Authorization': 'Bearer %s' %bot_token}
+						headers = {'Authorization': 'Bearer %s' %bot_token}
 						if DEBUG:
 							print('Headers for send request:', headers)
 						channels_list = requests.get('https://slack.com/api/conversations.list',
@@ -97,7 +98,7 @@ while True:
 							channels = channels_dict['channels']
 							username = attrib_dict['user_name']
 							for channel in range(len(channels)):
-								print(channels[channel]['id'],channels[channel]['name'])
+								print(channels[channel]['id'], channels[channel]['name'])
 								if channels[channel]['name'] == got_channel_name:
 									channel_id = channels[channel]['id']
 									if DEBUG:
