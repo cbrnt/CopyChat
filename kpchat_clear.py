@@ -9,6 +9,7 @@ import os
 import urllib.parse
 import datetime
 import time
+import date
 
 DEBUG = True
 
@@ -56,18 +57,17 @@ if channels_list.status_code == 200:
 			messages = messages.json()
 			for message in range(len(messages.get('messages'))):
 				print(messages.get('messages')[message].get('ts'))
-				current_time = datetime.now
+				current_date = date.today()
 				if DEBUG:
-					print('current_time', current_time)
-				last_month = datetime.now[1] - 1
+					print('current_time', current_date)
+				last_month_date = current_date.replace(month=current_date.month - 1)
 				if DEBUG:
-					print('last_month= ', last_month)
-				unix_time = time.mktime(last_month)
+					print('last_month= ', last_month_date)
 				if DEBUG:
-					print('unix_time= ', unix_time)
-				unix_time_turple = time.mktime(last_month.timetuple())
+					print('unix_time= ', unix_time_last_month)
+				unix_time_last_month = time.mktime(last_month_date.timetuple())
 				if DEBUG:
-					print('unix_time_turple= ', unix_time_turple)
+					print('unix_time_turple= ', unix_time_last_month)
 
 
 
