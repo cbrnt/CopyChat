@@ -32,7 +32,7 @@ while True:
 
 		while True:
 			conn, addr = ssock.accept()
-			data = conn.recv(1024)
+			data = conn.recv(30000)
 			if DEBUG:
 				print('conn: ', conn)
 				print('Connected by', addr)
