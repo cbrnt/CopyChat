@@ -7,6 +7,8 @@ import requests
 import re
 import os
 import urllib.parse
+import datetime
+import time
 
 DEBUG = True
 
@@ -53,5 +55,19 @@ if channels_list.status_code == 200:
 				print(messages.text)
 			messages = messages.json()
 			for message in range(len(messages.get('messages'))):
-			    print(messages.get('messages')[message].get('ts'))
+				print(messages.get('messages')[message].get('ts'))
+				current_time = datetime.now
+				if DEBUG:
+					print('current_time', current_time)
+				last_month = datetime.now[1] - 1
+				if DEBUG:
+					print('last_month= ', last_month)
+				unix_time = time.mktime(last_month)
+				if DEBUG:
+					print('unix_time= ', unix_time)
+				unix_time_turple = time.mktime(last_month.timetuple())
+				if DEBUG:
+					print('unix_time_turple= ', unix_time_turple)
+
+
 
