@@ -39,20 +39,19 @@ if channels_list.status_code == 200:
 			channel_id = channels[channel]['id']
 			if DEBUG:
 				print('channel_id = ', channel_id)
-			headers = {'Authorization': 'Bearer %s' % bot_token, 'Content-type': 'application/json'}
+			headers = {'Authorization': 'Bearer %s' % bot_token, 'Content-type': 'application/x-www-form-urlencoded'}
 			if DEBUG:
 				print('Headers for send request:', headers)
 			# делаем запрос истории сообщений
-			json = {
-				'channel': '%s' % channel_id
-			}
+			data = 'channel=%s' % channel_id
 			if DEBUG:
-				print('json = ', '%s' % json)
-			messages = requests.get('https://slack.com/api/conversations.history', headers=headers, json=json)
+				print('json = ', json)
+			messages = requests.post('https://slack.com/api/conversations.history', headers=headers, data=data)
 			if DEBUG:
+				print('Messages:')
 				print(messages.headers)
 				print(messages.text)
 			messages = messages.json()
-			ts = messages['ts']
-			if DEBUG:
-				print('ts: ', ts)
+			for message in range(len(messages.get('messages'))):
+			    print(messages.get('messages')[message].get('ts'))
+
