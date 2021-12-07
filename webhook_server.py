@@ -14,6 +14,8 @@ DEBUG = 1
 CERT = '/etc/letsencrypt/live/gate.tochkak.ru/fullchain.pem'
 PRIVATE_CERT = '/etc/letsencrypt/live/gate.tochkak.ru/privkey.pem'
 
+# есть проблема с пересылкой множества мелких сообщений
+# если отправить 5 подряд - придут только первые 3
 
 context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 context.load_cert_chain(CERT, PRIVATE_CERT)
