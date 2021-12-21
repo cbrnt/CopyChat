@@ -113,7 +113,8 @@ while True:
                                     json = {"channel": "%s" % channel_id,
                                             "text": "%s" % got_text,
                                             "username": "%s" % username,
-                                            "link_names": True
+                                            "link_names": True,
+                                            "as_user": True
                                             }
                                     if DEBUG:
                                         print('json = ', json)
