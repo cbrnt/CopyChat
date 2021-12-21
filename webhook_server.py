@@ -10,7 +10,7 @@ import urllib.parse
 
 HOST = '0.0.0.0'
 PORT = 8070
-DEBUG = False
+DEBUG = True
 CERT = '/etc/letsencrypt/live/gate.tochkak.ru/fullchain.pem'
 PRIVATE_CERT = '/etc/letsencrypt/live/gate.tochkak.ru/privkey.pem'
 
@@ -89,18 +89,19 @@ while True:
                         channels_list = requests.get('https://slack.com/api/conversations.list',
                                                      headers=headers)
                         if channels_list.status_code == 200:
+                            channels_dict = channels_list.json()
                             if DEBUG:
                                 print('channel_list status code: ', channels_list.status_code)
                                 print('channel_list text: ', channels_list.text)
                                 print('channel_list headers: ', channels_list.headers)
-                            channels_dict = channels_list.json()
-                            print('Type channels_dict: ', type(channels_dict))
-                            print('channels_dict = ', channels_dict)
-                            print('id = ', channels_dict['channels'])
+                                print('Type channels_dict: ', type(channels_dict))
+                                print('channels_dict = ', channels_dict)
+                                print('id = ', channels_dict['channels'])
                             channels = channels_dict['channels']
                             username = attrib_dict['user_name']
                             for channel in range(len(channels)):
-                                print(channels[channel]['id'], channels[channel]['name'])
+                                if DEBUG:
+                                    print(channels[channel]['id'], channels[channel]['name'])
                                 if channels[channel]['name'] == got_channel_name:
                                     channel_id = channels[channel]['id']
                                     if DEBUG:
