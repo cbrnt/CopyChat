@@ -3,12 +3,12 @@ import os
 
 import pandas as pd
 
-import ast
+import time
 
 
 
 # todo добавь чтение хука из первого аргумента
-CHANNEL = 'test-out-hooks'
+CHANNEL = 'kpchat'
 
 # получаем список каналов
 bot_token = os.environ['SLACK_BOT_TOKEN']
@@ -44,9 +44,9 @@ if channels_list.status_code == 200:
 					'Authorization': 'Bearer %s' % user_token,
 					'Content-type': 'application/x-www-form-urlencoded'
 				}
+				# можно сделать через Sessions, чтобы не поднимать каждый раз TCP соединение
 				del_messages = requests.post('https://slack.com/api/chat.delete', headers=headers, data=data_to_del)
-print()
-
+				time.sleep(2)
 
 
 
