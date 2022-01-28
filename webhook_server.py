@@ -21,7 +21,8 @@ context.load_cert_chain(CERT, PRIVATE_CERT)
 def get_name(user_id_list, slack_token=SLACK_TOCHKAK_BOT_TOKEN):
     """Получаает slack user id и возвращает список из кортежей"""
     headers_func = {'Authorization': 'Bearer %s' % slack_token,
-                    'Content-type': 'application/x-www-form-urlencoded'}
+                    'Content-type': 'application/x-www-form-urlencoded'
+                    }
     get_list = requests.post('https://slack.com/api/users.list', headers=headers_func)
     if get_list.status_code == 200:
         users_list = get_list.json()
