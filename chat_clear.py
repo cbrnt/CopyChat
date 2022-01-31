@@ -40,7 +40,10 @@ if args.MONTHS:
 else:
     PERIOD_MONTHS = 0
 
-LOGLEVEL = args.loglevel
+if args.loglevel:
+    LOGLEVEL = args.loglevel
+else:
+    LOGLEVEL = ''
 TEAM = args.TEAM
 
 # выставляем уровень логирования
