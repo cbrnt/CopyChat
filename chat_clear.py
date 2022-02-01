@@ -1,4 +1,5 @@
 import logging
+import logging.config
 import time
 
 import requests
@@ -99,9 +100,9 @@ def remove_messages(message_dict):
             data = {'channel': '%s' % channel_id, 'ts': '%s' % tts, 'as_user': 'true'}
             remove = slack_session.post('https://slack.com/api/chat.delete', data=data)
             remove_json = remove.json()
-            if remove.status_code != 200 and not remove_json['ok']:
-                logging.warning('Ошибка: %s' % remove.text)
-                return False
+            if not remove_json['ok']:
+                raise MyErrors.RemoveMessageError(remove_json['error'], CHANNEL)
+
     for ts in message_dict.keys():
         time.sleep(5)  # нельзя слишком быстро делать запросы к API
         # print('keys:', 'ts', ts)

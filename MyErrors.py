@@ -12,3 +12,11 @@ class TeamMissError(Exception):
     def __init__(self, *args):
         if args:
             print('Укажи команду, где чистить канал')
+
+
+class RemoveMessageError(Exception):
+
+    def __init__(self, *args):
+        if args:
+            logging.error('Ошибка авторизации в канале:', args)
+            print('Ошибка авторизации в канале:', args)
