@@ -10,7 +10,6 @@ import pandas as pd
 import argparse
 import MyErrors
 
-
 slack_teams = 'TOCHKAK|KINOPLAN_OTHER'
 
 parser = argparse.ArgumentParser()
@@ -55,6 +54,7 @@ if not isinstance(numeric_level, int):
 else:
     logging.basicConfig(filename='%s' % log_file, level=numeric_level)
 
+
 # получаем список каналов
 
 def get_threads(messages_dict, channel_id_func):
@@ -83,31 +83,7 @@ def get_threads(messages_dict, channel_id_func):
         else:
             ts_dict[message['ts']] = []
     return ts_dict
-  
-  channels = channels_dict['channels']
-	for channel in range(len(channels)):
-		if channels[channel]['name'] == CHANNEL:
-			channel_id = channels[channel]['id']
-			headers = {'Authorization': 'Bearer %s' % bot_token, 'Content-type': 'application/x-www-form-urlencoded'}
-			# считаем время
-			now = pd.Timestamp.today()
-			two_months_ago = now - pd.DateOffset(months=1)
-			search_date = ((two_months_ago - pd.Timestamp("1970-01-01")) // pd.Timedelta('1s'))
-			data_get_history = {'channel': '%s' % channel_id, 'limit': '1000', 'latest': '%s' % search_date}
-			# делаем запрос истории сообщений
-			get_history = requests.post('https://slack.com/api/conversations.history', headers=headers, data=data_get_history)
-			if get_history.status_code == 200:
-				get_history = get_history.json()
-			for message in get_history.get('messages'):
-				ts = message['ts']
-				data_to_del = {'channel': '%s' % channel_id, 'ts': '%s' % ts, 'as_user': 'true'}
-				headers = {
-					'Authorization': 'Bearer %s' % user_token,
-					'Content-type': 'application/x-www-form-urlencoded'
-				}
-				# можно сделать через Sessions, чтобы не поднимать каждый раз TCP соединение
-				del_messages = requests.post('https://slack.com/api/chat.delete', headers=headers, data=data_to_del)
-				time.sleep(2)
+
 
 def remove_messages(message_dict):
     """Принимает словарь с ts сообщений и ts потомков. Удаляет сначала треды, затем их родителей"""
@@ -154,8 +130,8 @@ data = {
 }
 headers = {'Authorization': 'Bearer %s' % bot_token}
 channels_list = requests.post('https://slack.com/api/conversations.list',
-                             headers=headers,
-                             data=data)
+                              headers=headers,
+                              data=data)
 if channels_list.status_code == 200:
     channels_dict = channels_list.json()
     if channels_dict['ok']:
@@ -163,7 +139,8 @@ if channels_list.status_code == 200:
         for channel in range(len(channels)):
             if channels[channel]['name'] == CHANNEL:
                 channel_id = channels[channel]['id']
-                headers = {'Authorization': 'Bearer %s' % bot_token, 'Content-type': 'application/x-www-form-urlencoded'}
+                headers = {'Authorization': 'Bearer %s' % bot_token,
+                           'Content-type': 'application/x-www-form-urlencoded'}
                 # считаем время
                 now = pd.Timestamp.today()
                 if PERIOD_MONTHS:
