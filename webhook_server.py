@@ -24,7 +24,7 @@ def get_name(user_id_list, slack_token=SLACK_TOCHKAK_BOT_TOKEN):
     headers_func = {'Authorization': 'Bearer %s' % slack_token,
                     'Content-type': 'application/x-www-form-urlencoded'
                     }
-    get_list = requests.post('https://slack.com/api/users.list', headers=headers_func)
+    get_list = requests.post('https://slack.com/api/users.list', headers=headers_func, timeout=10)
     if get_list.status_code == 200:
         users_list = get_list.json()
         name_list = []
@@ -52,12 +52,8 @@ def id_to_name_text(text):
     """Заменяет slack ID на нормальные имена"""
     get_id_list = find_id(text)
     get_name_list = get_name(get_id_list)
-    final_text = ''
     for id_name in get_name_list:
-        if final_text != '':
-            final_text = final_text.replace('<@' + id_name[0] + '>', id_name[1])
-        else:
-            final_text = text.replace('<@' + id_name[0] + '>', id_name[1])
+        final_text = text.replace('<@' + id_name[0] + '>', id_name[1])
     return final_text
 
 while True:
@@ -134,7 +130,7 @@ while True:
                         if DEBUG:
                             print('Headers for send request:', headers)
                         channels_list = requests.get('https://slack.com/api/conversations.list',
-                                                     headers=headers)
+                                                     headers=headers, timeout=10)
                         if channels_list.status_code == 200:
 
                             if DEBUG:
@@ -167,7 +163,7 @@ while True:
                                     if DEBUG:
                                         print('json = ', json)
                                     channels_list = requests.post('https://slack.com/api/chat.postMessage',
-                                                                  headers=headers, json=json)
+                                                                  headers=headers, json=json, timeout=10)
 
                     else:
                         if DEBUG:
