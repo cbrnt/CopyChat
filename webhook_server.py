@@ -10,17 +10,16 @@ import urllib.parse
 SLACK_TOCHKAK_BOT_TOKEN = os.environ['SLACK_TOCHKAK_BOT_TOKEN']
 HOST = '0.0.0.0'
 PORT = 8070
-DEBUG = True
-CERT = '/etc/letsencrypt/live/gate.tochkak.ru/fullchain.pem'
-PRIVATE_CERT = '/etc/letsencrypt/live/gate.tochkak.ru/privkey.pem'
+DEBUG = False
+CERT = os.environ['CERT']
+PRIVATE_CERT = os.environ['PRIVATE_CERT']
 
 context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 context.load_cert_chain(CERT, PRIVATE_CERT)
 
 
-
 def get_name(user_id_list, slack_token=SLACK_TOCHKAK_BOT_TOKEN):
-    """Получаает slack user id и возвращает список из кортежей"""
+    """Получает slack user id и возвращает список из кортежей"""
     headers_func = {'Authorization': 'Bearer %s' % slack_token,
                     'Content-type': 'application/x-www-form-urlencoded'
                     }
@@ -52,8 +51,11 @@ def id_to_name_text(text):
     """Заменяет slack ID на нормальные имена"""
     get_id_list = find_id(text)
     get_name_list = get_name(get_id_list)
-    for id_name in get_name_list:
-        final_text = text.replace('<@' + id_name[0] + '>', id_name[1])
+    if get_id_list and find_id:
+        for id_name in get_name_list:
+            final_text = text.replace('<@' + id_name[0] + '>', id_name[1])
+    else:
+        final_text = text
     return final_text
 
 while True:
