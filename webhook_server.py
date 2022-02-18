@@ -10,12 +10,13 @@ import urllib.parse
 SLACK_TOCHKAK_BOT_TOKEN = os.environ['SLACK_TOCHKAK_BOT_TOKEN']
 HOST = '0.0.0.0'
 PORT = 8070
-DEBUG = 1
+DEBUG = True
 CERT = '/etc/letsencrypt/live/gate.tochkak.ru/fullchain.pem'
 PRIVATE_CERT = '/etc/letsencrypt/live/gate.tochkak.ru/privkey.pem'
 
 context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 context.load_cert_chain(CERT, PRIVATE_CERT)
+
 
 
 def get_name(user_id_list, slack_token=SLACK_TOCHKAK_BOT_TOKEN):
@@ -67,6 +68,7 @@ while True:
         sock.bind((HOST, PORT))
         if DEBUG:
             print('Bound port: ', PORT)
+
         sock.listen(5)  # limited to 5 connection in queue
         # оборачиваем в SSL и принимаем дату для каждого нового соежинения
         ssock = context.wrap_socket(sock, server_side=True)
@@ -90,8 +92,10 @@ while True:
                         print(result)
                     attrib_list = re.split('&', result[0])
                     attrib_dict = dict()
+
                     for itr in attrib_list:
                         splitted_att = re.split('=', itr)
+
                         attrib_dict[splitted_att[0]] = splitted_att[1]
                     if DEBUG:
                         print(attrib_dict)
@@ -118,6 +122,7 @@ while True:
                             print('got_channel = ', got_channel_name)
                             print('got_text = ', got_text)
 
+
                         # парсим из текста slack user id и подставляем имя
 
 
@@ -131,10 +136,12 @@ while True:
                         channels_list = requests.get('https://slack.com/api/conversations.list',
                                                      headers=headers)
                         if channels_list.status_code == 200:
+
                             if DEBUG:
                                 print('channel_list status code: ', channels_list.status_code)
                                 print('channel_list text: ', channels_list.text)
                                 print('channel_list headers: ', channels_list.headers)
+                                
                             channels_dict = channels_list.json()
                             print('Type channels_dict: ', type(channels_dict))
                             print('channels_dict = ', channels_dict)
@@ -147,6 +154,7 @@ while True:
                                     channel_id = channels[channel]['id']
                                     if DEBUG:
                                         print('channel_id = ', channel_id)
+
                                     headers = {'Authorization': 'Bearer %s' % bot_token,
                                                'Content-type': 'application/json'}
                                     if DEBUG:
@@ -155,6 +163,7 @@ while True:
                                     json = {"channel": "%s" % channel_id,
                                             "text": "%s" % text_to_slack,
                                             "username": "%s" % username}
+
                                     if DEBUG:
                                         print('json = ', json)
                                     channels_list = requests.post('https://slack.com/api/chat.postMessage',
@@ -175,3 +184,5 @@ while True:
             if sock:
                 sock.close()
         break
+
+
