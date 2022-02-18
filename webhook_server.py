@@ -2,23 +2,63 @@
 
 import socket
 import ssl
-import json
 import requests
 import re
 import os
 import urllib.parse
 
+SLACK_TOCHKAK_BOT_TOKEN = os.environ['SLACK_TOCHKAK_BOT_TOKEN']
 HOST = '0.0.0.0'
 PORT = 8070
 DEBUG = True
 CERT = '/etc/letsencrypt/live/gate.tochkak.ru/fullchain.pem'
 PRIVATE_CERT = '/etc/letsencrypt/live/gate.tochkak.ru/privkey.pem'
 
-# есть проблема с пересылкой множества мелких сообщений
-# если отправить 5 подряд - придут только первые 3
-
 context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
 context.load_cert_chain(CERT, PRIVATE_CERT)
+
+
+
+def get_name(user_id_list, slack_token=SLACK_TOCHKAK_BOT_TOKEN):
+    """Получаает slack user id и возвращает список из кортежей"""
+    headers_func = {'Authorization': 'Bearer %s' % slack_token,
+                    'Content-type': 'application/x-www-form-urlencoded'
+                    }
+    get_list = requests.post('https://slack.com/api/users.list', headers=headers_func)
+    if get_list.status_code == 200:
+        users_list = get_list.json()
+        name_list = []
+        if users_list.get('ok'):
+            for user_id in user_id_list:
+                for user in users_list['members']:
+                    if user.get('id') == user_id:
+                        name_list.append((user.get('id'), user.get('real_name')))
+            return name_list
+    return False
+
+
+def find_id(text):
+    """Находит и возвращает список ID slack"""
+    # pattern_func = re.compile(r'<@U\w+>')
+    pattern_func = re.compile(r"<@U\w+>")
+    result_func = pattern_func.findall(text)
+    for itr in range(len(result_func)):
+        result_func[itr] = result_func[itr].replace('<@', '')
+        result_func[itr] = result_func[itr].replace('>', '')
+    return result_func
+
+
+def id_to_name_text(text):
+    """Заменяет slack ID на нормальные имена"""
+    get_id_list = find_id(text)
+    get_name_list = get_name(get_id_list)
+    final_text = ''
+    for id_name in get_name_list:
+        if final_text != '':
+            final_text = final_text.replace('<@' + id_name[0] + '>', id_name[1])
+        else:
+            final_text = text.replace('<@' + id_name[0] + '>', id_name[1])
+    return final_text
 
 while True:
     sock = None
@@ -27,7 +67,8 @@ while True:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.bind((HOST, PORT))
         if DEBUG:
-            print('Binded port', PORT)
+            print('Bound port: ', PORT)
+
         sock.listen(5)  # limited to 5 connection in queue
         # оборачиваем в SSL и принимаем дату для каждого нового соежинения
         ssock = context.wrap_socket(sock, server_side=True)
@@ -51,8 +92,10 @@ while True:
                         print(result)
                     attrib_list = re.split('&', result[0])
                     attrib_dict = dict()
-                    for i in attrib_list:
-                        splitted_att = re.split('=', i)
+
+                    for itr in attrib_list:
+                        splitted_att = re.split('=', itr)
+
                         attrib_dict[splitted_att[0]] = splitted_att[1]
                     if DEBUG:
                         print(attrib_dict)
@@ -79,6 +122,10 @@ while True:
                             print('got_channel = ', got_channel_name)
                             print('got_text = ', got_text)
 
+
+                        # парсим из текста slack user id и подставляем имя
+
+
                         # получаем список каналов другого спейса
                         bot_token = os.environ['SLACK_BOT_TOKEN']
                         if DEBUG:
@@ -89,39 +136,38 @@ while True:
                         channels_list = requests.get('https://slack.com/api/conversations.list',
                                                      headers=headers)
                         if channels_list.status_code == 200:
-                            channels_dict = channels_list.json()
+
                             if DEBUG:
                                 print('channel_list status code: ', channels_list.status_code)
                                 print('channel_list text: ', channels_list.text)
                                 print('channel_list headers: ', channels_list.headers)
-                                print('Type channels_dict: ', type(channels_dict))
-                                print('channels_dict = ', channels_dict)
-                                print('id = ', channels_dict['channels'])
+                                
+                            channels_dict = channels_list.json()
+                            print('Type channels_dict: ', type(channels_dict))
+                            print('channels_dict = ', channels_dict)
+                            print('id = ', channels_dict['channels'])
                             channels = channels_dict['channels']
                             username = attrib_dict['user_name']
                             for channel in range(len(channels)):
-                                if DEBUG:
-                                    print(channels[channel]['id'], channels[channel]['name'])
+                                print(channels[channel]['id'], channels[channel]['name'])
                                 if channels[channel]['name'] == got_channel_name:
                                     channel_id = channels[channel]['id']
                                     if DEBUG:
                                         print('channel_id = ', channel_id)
-                                    # постим сообщение в нужный канал
+
                                     headers = {'Authorization': 'Bearer %s' % bot_token,
                                                'Content-type': 'application/json'}
                                     if DEBUG:
                                         print('Headers for send request:', headers)
+                                    text_to_slack = id_to_name_text(got_text)
                                     json = {"channel": "%s" % channel_id,
-                                            "text": "%s" % got_text,
-                                            "username": "%s" % username,
-                                            "link_names": True,
-                                            "as_user": True
-                                            }
+                                            "text": "%s" % text_to_slack,
+                                            "username": "%s" % username}
+
                                     if DEBUG:
                                         print('json = ', json)
                                     channels_list = requests.post('https://slack.com/api/chat.postMessage',
                                                                   headers=headers, json=json)
-
 
                     else:
                         if DEBUG:
@@ -132,11 +178,6 @@ while True:
                     if DEBUG:
                         print('Data received but "result" is empty... Going next loop iteration!')
 
-
-
-
-
-
     except KeyboardInterrupt:
         if ssock:
             ssock.close()
@@ -144,4 +185,4 @@ while True:
                 sock.close()
         break
 
-# Re-create hooks that were used in non-secured connections
+
